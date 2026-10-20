@@ -1,0 +1,79 @@
+name: SparkPlug
+options:
+  bundleIdPrefix: io.sprkplg
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+packages:
+  SparkPlugCore:
+    path: Core
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    # Ad-hoc signing, so anyone can build it without an Apple developer team.
+    # `make run TEAM=<your team id>` signs with your own team instead.
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: YES
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: YES
+    GCC_TREAT_WARNINGS_AS_ERRORS: YES
+targets:
+  SparkPlug:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+    dependencies:
+      - package: SparkPlugCore
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: SparkPlug
+        CFBundleName: SparkPlug
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.productivity
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: io.sprkplg.task
+            UTTypeDescription: SparkPlug task
+            UTTypeConformsTo: [public.data]
+        NSHumanReadableCopyright: "© 2026 Jesse Lovelace. MIT License."
+        NSCalendarsFullAccessUsageDescription: SparkPlug shows your calendar events next to your tasks. It changes a calendar only if you choose one to copy your time blocks to.
+        NSCalendarsUsageDescription: SparkPlug shows your calendar events next to your tasks. It changes a calendar only if you choose one to copy your time blocks to.
+    entitlements:
+      path: App/SparkPlug.entitlements
+      properties:
+        com.apple.security.personal-information.calendars: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.sprkplg.SparkPlug
+        PRODUCT_NAME: SparkPlug
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        COMBINE_HIDPI_IMAGES: YES
+  SparkPlugTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: AppTests
+    dependencies:
+      - target: SparkPlug
+      - package: SparkPlugCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.sprkplg.SparkPlug.tests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  SparkPlug:
+    build:
+      targets:
+        SparkPlug: all
+        SparkPlugTests: [test]
+    test:
+      targets:
+        - SparkPlugTests
